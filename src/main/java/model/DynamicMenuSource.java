@@ -5,13 +5,17 @@ import org.bukkit.inventory.ItemStack;
 import org.mineacademy.fo.Common;
 import org.mineacademy.fo.menu.button.Button;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 public class DynamicMenuSource<T> {
 
     private final List<Button> buttons = new CopyOnWriteArrayList<>();
+
+    private List<T> cachedData = new ArrayList<>();
 
     private final String menuTrackingKey;
     private final Function<T, String> keyExtractor;
@@ -63,9 +67,49 @@ public class DynamicMenuSource<T> {
         refreshMenus();
     }
 
-    public void update(T item) {
-        remove(item);
-        add(item);
+    public void update(List<T> newData) {
+        if (this.cachedData.size() != newData.size()) {
+            setContent(newData);
+            return;
+        }
+
+        boolean hasChanges = false;
+
+        for (int i = 0; i < newData.size(); i++) {
+            T oldItem = this.cachedData.get(i);
+            T newItem = newData.get(i);
+
+            if (!Objects.equals(oldItem, newItem)) {
+                Button newButton = createButton(newItem);
+
+                String oldKey = menuTrackingKey + "_item_" + keyExtractor.apply(oldItem);
+                AsyncItemManager.getInstance().remove(oldKey);
+
+                buttons.set(i, newButton);
+                hasChanges = true;
+            }
+        }
+
+        if (hasChanges) {
+            this.cachedData = new ArrayList<>(newData);
+            refreshMenus();
+        }
+    }
+
+    public void replace(T oldItem, T newItem) {
+        for (int i = 0; i < buttons.size(); i++) {
+            Button b = buttons.get(i);
+            if (b instanceof GenericAsyncButton) {
+                GenericAsyncButton<T> btn = (GenericAsyncButton<T>) b;
+                // Сравниваем именно данные
+                if (btn.getData() != null && btn.getData().equals(oldItem)) {
+                    // Создаем новую кнопку и ставим её на ТОТ ЖЕ индекс
+                    buttons.set(i, createButton(newItem));
+                    refreshMenus(); // Обновляем меню игрокам
+                    return;
+                }
+            }
+        }
     }
 
     public void setContent(List<T> items) {
@@ -73,6 +117,8 @@ public class DynamicMenuSource<T> {
         for (T item : items) {
             buttons.add(createButton(item));
         }
+        this.cachedData = new ArrayList<>(items);
+        refreshMenus();
     }
 
     private Button createButton(T item) {
