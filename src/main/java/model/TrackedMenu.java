@@ -1,8 +1,10 @@
 package model;
 
 import config.MessageManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.mineacademy.fo.Common;
 import org.mineacademy.fo.menu.Menu;
 
 import java.util.HashSet;
@@ -51,12 +53,14 @@ public abstract class TrackedMenu extends Menu {
     }
 
     public static void refreshAll(Object key) {
-        Set<TrackedMenu> instances = openInstancesByKey.get(key);
-        if (instances != null) {
-            for (TrackedMenu menu : new HashSet<>(instances)) {
-                menu.restartMenu();
+        Common.runLater(() -> {
+            Set<TrackedMenu> instances = openInstancesByKey.get(key);
+            if (instances != null) {
+                for (TrackedMenu menu : new HashSet<>(instances)) {
+                    menu.restartMenu();
+                }
             }
-        }
+        });
     }
 
     protected void refreshAll() {
