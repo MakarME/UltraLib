@@ -60,6 +60,30 @@ public class MessageManager {
         return getString(player, path, new HashMap<>());
     }
 
+    public String getString(Player player, String path, String... placeholders) {
+        return getString(player, path, convertToMap(placeholders));
+    }
+
+    public List<String> getList(Player player, String path, String... placeholders) {
+        return getList(player, path, convertToMap(placeholders));
+    }
+
+    public String getJoinedString(Player player, String path, String... placeholders) {
+        return getJoinedString(player, path, convertToMap(placeholders));
+    }
+
+    private Map<String, String> convertToMap(String... placeholders) {
+        Map<String, String> map = new HashMap<>();
+
+        // Идем по массиву с шагом 2
+        for (int i = 0; i < placeholders.length; i += 2) {
+            if (i + 1 < placeholders.length) {
+                map.put(placeholders[i], placeholders[i + 1]);
+            }
+        }
+        return map;
+    }
+
     public List<String> getList(Player player, String path, Map<String, String> placeholders) {
         if (!config.contains(path)) {
             return Collections.singletonList(ChatColor.RED + "Missing: " + path);
