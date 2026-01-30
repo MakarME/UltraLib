@@ -112,6 +112,22 @@ public class DynamicMenuSource<T> {
         }
     }
 
+    public void refreshItem(java.util.function.Predicate<T> matcher) {
+        boolean found = false;
+        for (T item : cachedData) {
+            if (matcher.test(item)) {
+                String key = menuTrackingKey + "_item_" + keyExtractor.apply(item);
+
+                manager.AsyncItemManager.getInstance().remove(key);
+                found = true;
+            }
+        }
+
+        if (found) {
+            refreshMenus();
+        }
+    }
+
     public void setContent(List<T> items) {
         buttons.clear();
         for (T item : items) {
