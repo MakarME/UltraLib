@@ -111,6 +111,10 @@ public class DynamicMenuSource<T> {
     public List<Button> getButtons() { return buttons; }
 
     public void add(T item) {
+        String itemKeyStr = keyExtractor.apply(item);
+        String uniqueKey = menuTrackingKey + "_item_" + itemKeyStr;
+        AsyncItemManager.getInstance().remove(uniqueKey);
+
         buttons.add(createButton(item));
         refreshMenus();
     }
@@ -134,8 +138,12 @@ public class DynamicMenuSource<T> {
             T oldItem = this.cachedData.get(i);
             T newItem = newData.get(i);
             if (!Objects.equals(oldItem, newItem)) {
-                String oldKey = menuTrackingKey + "_item_" + keyExtractor.apply(oldItem);
-                AsyncItemManager.getInstance().remove(oldKey);
+                String oldKeyStr = keyExtractor.apply(oldItem);
+                String oldUniqueKey = menuTrackingKey + "_item_" + oldKeyStr;
+                AsyncItemManager.getInstance().remove(oldUniqueKey);
+                String newKeyStr = keyExtractor.apply(newItem);
+                String newUniqueKey = menuTrackingKey + "_item_" + newKeyStr;
+                AsyncItemManager.getInstance().remove(newUniqueKey);
 
                 buttons.set(i, createButton(newItem));
                 hasChanges = true;
@@ -172,8 +180,9 @@ public class DynamicMenuSource<T> {
                 if (btn.getData() == null) return item == null;
                 boolean match = btn.getData().equals(item);
                 if (match) {
-                    String key = keyExtractor.apply(btn.getData());
-                    AsyncItemManager.getInstance().remove(key);
+                    String itemKeyStr = keyExtractor.apply(btn.getData());
+                    String uniqueKey = menuTrackingKey + "_item_" + itemKeyStr;
+                    AsyncItemManager.getInstance().remove(uniqueKey);
                 }
                 return match;
             }
