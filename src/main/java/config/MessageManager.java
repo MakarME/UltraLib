@@ -120,7 +120,12 @@ public class MessageManager {
         if (message == null) return "";
 
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            message = message.replace("{" + entry.getKey() + "}", entry.getValue());
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (value == null) value = "";
+
+            message = message.replace("{" + key + "}", value);
         }
 
         if (player != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
