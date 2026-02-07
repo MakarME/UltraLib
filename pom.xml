@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.github.kangarko</groupId>
             <artifactId>Foundation</artifactId>
-            <version>6.9.22</version>
+            <version>6.9.23</version>
             <scope>compile</scope>
             <exclusions>
             <exclusion>
