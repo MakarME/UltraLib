@@ -48,14 +48,21 @@ public abstract class GlobalTimedMenu extends TrackedMenu {
 
     @Override
     protected void onMenuClose(Player player, Inventory inventory) {
-        // 1. Сначала логика TrackedMenu (удаление из мапы по ключу)
+        // Логика TrackedMenu (там проверка уже есть внутри)
         super.onMenuClose(player, inventory);
 
-        // 2. Убираем из списка таймера
-        tickingMenus.remove(this);
+        // --- КОПИРУЕМ ЛОГИКУ ИЗ TrackedMenu ---
 
-        // 3. Если меню больше нет, глушим задачу
-        stopTimerIfEmpty();
+        // Получаем меню, которое сейчас открыто у игрока
+        Menu currentMenu = Menu.getMenu(player);
+
+        // Если currentMenu == this, значит это просто restartMenu() (обновление),
+        // и мы НЕ должны удалять себя из таймера.
+        // Удаляем только если игрок реально закрыл меню или перешел в другое.
+        if (currentMenu != this) {
+            tickingMenus.remove(this);
+            stopTimerIfEmpty();
+        }
     }
 
     // --- ГЛОБАЛЬНЫЙ ТАЙМЕР ---
