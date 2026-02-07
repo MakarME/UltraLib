@@ -39,4 +39,21 @@ public class TimeUtil {
     public static String formatDate(long millis) {
         return DATE_FORMATTER.format(Instant.ofEpochMilli(millis));
     }
+
+    public static String formatDuration(long millis) {
+        if (millis <= 0) return "0";
+
+        long totalSeconds = millis / 1000;
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        if (hours > 0) {
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        } else if(minutes > 0) {
+            return String.format("%02d:%02d", minutes, seconds);
+        } else {
+            return String.format("%02d", seconds);
+        }
+    }
 }
