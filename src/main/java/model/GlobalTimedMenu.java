@@ -30,7 +30,6 @@ public abstract class GlobalTimedMenu extends TrackedMenu {
 
     /**
      * Выполняется АСИНХРОННО раз в секунду.
-     * Тут считаем время, форматируем строки, но НЕ трогаем Bukkit API.
      */
     protected abstract void onAsyncTick();
 
