@@ -4,6 +4,7 @@ import config.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.mineacademy.fo.Common;
 import org.mineacademy.fo.menu.Menu;
 
@@ -65,5 +66,16 @@ public abstract class TrackedMenu extends Menu {
 
     protected void refreshAll() {
         refreshAll(getTrackingKey());
+    }
+
+    public static void updateSlotForAll(Object key, int slot, ItemStack item) {
+        Common.runLater(() -> {
+            Set<TrackedMenu> instances = openInstancesByKey.get(key);
+            if (instances != null) {
+                for (TrackedMenu menu : instances) {
+                    menu.setItem(slot, item);
+                }
+            }
+        });
     }
 }
